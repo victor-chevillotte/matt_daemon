@@ -58,12 +58,12 @@ void write_log(const std::string& message) {
     // create log file if does not exists 
     // write to log file with format [TIMESTAMP] message
     // /var/log/matt_daemon is existng directory ?
-    bool directory_success = createDirectoryIfNotExists("log");
+    bool directory_success = createDirectoryIfNotExists("/home/vchevill/Documents/matt_daemon/log");
     if (!directory_success) {
         ft_exit(EXIT_FAILURE);
     }
     std::string message_with_timestamp = "[" + std::to_string(std::time(nullptr)) + "] " + message;
-    std::ofstream logFile("/var/log/matt_daemon/matt_daemon.log", std::ios::app);
+    std::ofstream logFile("/home/vchevill/Documents/matt_daemon/log/matt_daemon.log", std::ios::app);
     if (logFile.is_open()) {
         logFile << message << std::endl;
         logFile.close();
