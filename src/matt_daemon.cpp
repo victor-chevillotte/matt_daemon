@@ -3,7 +3,40 @@
 #include <sys/stat.h>
 #include<unistd.h>
 #include <csignal>
+#include <ctime>
+#include <iostream>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <errno.h>
 
+bool createDirectoryIfNotExists(const std::string& path) {
+    DIR* dir = opendir(path.c_str());
+    if (dir) {
+        // Le dossier existe.
+        closedir(dir);
+        return true;
+    } else if (ENOENT == errno) {
+        // Le dossier n'existe pas et doit être créé.
+        if (mkdir(path.c_str(), 0755) == -1) {
+            std::cerr << "Erreur lors de la création du dossier" << std::endl;
+            return false;
+        }
+        return true;
+    } else {
+        // Le dossier existe mais ne peut pas être ouvert (peut-être en raison de chmod 000).
+        struct stat info;
+        if (stat(path.c_str(), &info) != 0) {
+            std::cerr << "Impossible d'accéder au dossier et de vérifier son existence " << std::endl;
+            return false;
+        }
+        if (S_ISDIR(info.st_mode)) {
+            // Le dossier existe.
+            return true;
+        }
+        std::cerr << "Le chemin existe, mais ce n'est pas un dossier." << std::endl;
+        return false;
+    }
+}
 
 void ft_exit(int status) {
     exit(status);
@@ -21,6 +54,25 @@ void set_signals() {
     }
 }
 
+void write_log(const std::string& message) {
+    // create log file if does not exists 
+    // write to log file with format [TIMESTAMP] message
+    // /var/log/matt_daemon is existng directory ?
+    bool directory_success = createDirectoryIfNotExists("log");
+    if (!directory_success) {
+        ft_exit(EXIT_FAILURE);
+    }
+    std::string message_with_timestamp = "[" + std::to_string(std::time(nullptr)) + "] " + message;
+    std::ofstream logFile("/var/log/matt_daemon/matt_daemon.log", std::ios::app);
+    if (logFile.is_open()) {
+        logFile << message << std::endl;
+        logFile.close();
+    } else {
+        std::cerr << "Failed to open or create log file" << std::endl;
+        ft_exit(EXIT_FAILURE);
+    }
+}
+
 bool is_file_existing(const std::string& name) {
     struct stat buffer;
     // check works even if file is a symlink or chmod 000
@@ -31,6 +83,7 @@ bool is_file_existing(const std::string& name) {
 int main() {
     const int PORT = 4242;
     std::cout << "Matt Daemon" << std::endl;
+    write_log("Started");
 
     // Check if the lock file exists and quit if it does
     // Only one daemon instance should be able to run at once.
@@ -41,7 +94,6 @@ int main() {
         std::cerr << "Lock file already exists" << std::endl;
         return 1;
     }
-
 
     // create lock file
     std::ofstream newLockFile("/var/lock/matt_daemon.lock");
@@ -77,7 +129,10 @@ int main() {
     // TODO: Log loop
     while (1) {
         sleep(1);
+        
     }
+
+    // delete lock file
 
     return 0;
 }
