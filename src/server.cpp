@@ -1,196 +1,146 @@
 #include "../inc/Server.hpp"
+#include <iostream>
 #include <cstring>
+#include <stdexcept>
+#include <unistd.h>
+#include <sys/socket.h>
 
-Server::Server(const std::string port)
-	: _host("127.0.0.1"), _name("matt_daemon"), _port(port)
-{
-	_sock = newSocket();
+Server::Server(const std::string& port)
+    : _host("127.0.0.1"), _name("matt_daemon"), _port(port), _sock(-1) {
+    _sock = newSocket();
 }
 
-Server::~Server()
-{
+Server::~Server() {
+    if (_sock != -1) {
+        close(_sock);
+    }
 }
 
-void Server::start()
-{
-	pollfd server_fd = {_sock, POLLIN, 0}; // POLLHUP & POLLERR are automatically checked
-	_pollfds.push_back(server_fd);
+void Server::start() {
+    if (_sock == -1) {
+        throw std::runtime_error("Socket not initialized.");
+    }
 
-	while (Server::running)
-	{
-		if (poll(_pollfds.begin().base(), _pollfds.size(), -1) < 0)
-			if (Server::running)
-				throw std::runtime_error("Error while polling from fd.");
-		for (pollfds_iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
-		{
+    pollfd server_fd = {_sock, POLLIN, 0}; // POLLHUP & POLLERR are automatically checked
+    _pollfds.push_back(server_fd);
 
-			if (it->revents & POLLHUP)
-			{
-				onClientDisconnect(it->fd);
-				break;
-			}
-
-            // POLLIN
-			if (it->revents & POLLIN)
-			{
-                // POLLIN for Server
-				if (it->fd == _sock)
-				{
-					onClientConnect();
-					break;
-				}
-                // POLLIN for Clients
-				else {
-					onClientMessage(it->fd);
-
-               }
+    while (_running) {
+        if (poll(_pollfds.data(), _pollfds.size(), -1) < 0) {
+            if (_running) {
+                throw std::runtime_error("Error while polling from fd.");
             }
-			// POLLOUT for Clients
-			if ((it->fd != _sock) && (it->revents & POLLOUT))
-			{
-				// No need to send messages to clients
-			}
+        }
 
-			// POLLERR for Clients
-			if ((it->fd != _sock) && (it->revents & POLLERR))
-			{
-				onClientDisconnect(it->fd);
-			}
+        for (pollfds_iterator it = _pollfds.begin(); it != _pollfds.end(); ++it) {
+            if (it->revents & POLLHUP) {
+                onClientDisconnect(it->fd);
+            } else if (it->revents & POLLIN) {
+                if (it->fd == _sock) {
+                    onClientConnect();
+                } else {
+                    onClientMessage(it->fd);
+                }
+            } else if (it->revents & POLLERR) {
+                if (it->fd == _sock) {
+                    _running = false;
+                } else {
+                    onClientDisconnect(it->fd);
+                }
+            }
+        }
 
-			//server POLLERR -> Server::running = false
-			if ((it->fd == _sock) && (it->revents & POLLERR))
-			{
-				Server::running = false;
-			}
+        deleteDisconnectedClients();
+    }
 
-		}
-		for (std::vector<int>::iterator it = _fdToDelete.begin(); it != _fdToDelete.end(); ++it)
-		{
-			deleteClient(*it);
-			std::cout << "Client deleted" << std::endl;
-		}
-		_fdToDelete.clear();
-	}
-	for (pollfds_iterator it = _pollfds.begin(); it != _pollfds.end(); it++)
-	{
-        pollfd pfd = *it;
-        std::cout << "Closing client socket: " << pfd.fd << std::endl;
-		close(pfd.fd);
-	}
-    _pollfds.clear();
-	close(_sock);
-	std::cout << "Server has been turned down. Goodbye !" << std::endl;
+    std::cout << "Server has been turned down. Goodbye !" << std::endl;
 }
 
-int Server::newSocket()
-{
+int Server::newSocket() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        throw std::runtime_error("Error while opening socket.");
+    }
 
-	/* creating socket :
-	 * domain : AF_INET -> Socket using IPV4
-	 * type : SOCK_STREAM : Dialogue support guaranteeing integrity, providing a binary data stream, and integrating a mechanism for out-of-band data transmissions.
-	 * protocol : 0 indicates that the caller does not want to specify the protocol and will leave it up to the service provider.
-	 */
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0)
-		throw std::runtime_error("Error while opening socket.");
+    int val = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) < 0) {
+        close(sockfd);
+        throw std::runtime_error("Error while setting socket options.");
+    }
 
-	/*Adding option to socket :
-	 * Socket Layer : SOL_SOCKET : Means we modify the socket itslef
-	 * option : SO_REUSEADDR : Forcefully attaching socket to the port
-	 * value : 1 for forcing socket to use port given
-	 */
-	int val = 1;
-	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)))
-		throw std::runtime_error("Error while setting socket options.");
+    struct sockaddr_in serv_address;
+    std::memset(&serv_address, 0, sizeof(serv_address));
+    serv_address.sin_family = AF_INET;
+    serv_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_address.sin_port = htons(std::stoi(_port));
 
-	/* Setting the socket to NON-BLOCKING mode allowing it to return any data that the system has in it's read buffer
-	 * for that socket even if the fd is still in use. It won't wait for that data to be terminated and will send an error.
-	 * command : F_SETFL : setting for state attribute of fd
-	 * arg : O_NONBLOCK meaning described previously
-	 */
+    if (bind(sockfd, (struct sockaddr *)&serv_address, sizeof(serv_address)) < 0) {
+        close(sockfd);
+        throw std::runtime_error("Error while setting socket IP address and port.");
+    }
 
+    if (listen(sockfd, MAX_CONNECTIONS) < 0) {
+        close(sockfd);
+        throw std::runtime_error("Error while listening on socket.");
+    }
 
-// Clear address structure
-sockaddr_in serv_address = {}; // Define and initialize serv_address
-
-// Bind the socket to the IP address and port
-if (bind(sockfd, (struct sockaddr *)&serv_address, sizeof(serv_address)) < 0)
-    throw std::runtime_error("Error while setting socket IP address and port.");
-
-	// Define max connexions and let socket be able to listen for requests
-	if (listen(sockfd, MAX_CONNECTIONS) < 0)
-		throw std::runtime_error("Error while listening on socket.");
-
-	return sockfd;
+    std::cout << "Server is listening on port " << _port << ", with sock : " << sockfd << std::endl;
+    return sockfd;
 }
 
-void Server::onClientConnect()
-{
+void Server::onClientConnect() {
+    sockaddr_in s_address;
+    socklen_t s_size = sizeof(s_address);
+    int fd = accept(_sock, (sockaddr *)&s_address, &s_size);
+    if (fd < 0) {
+        throw std::runtime_error("Error while accepting new client.");
+    }
 
-	// adding new fd to poll
-	int fd;
-	sockaddr_in s_address = {};
-	socklen_t s_size = sizeof(s_address);
+    pollfd pollfd = {fd, POLLIN | POLLOUT, 0};
+    _pollfds.push_back(pollfd);
 
-	fd = accept(_sock, (sockaddr *)&s_address, &s_size);
-	if (fd < 0)
-		throw std::runtime_error("Error while accepting new client.");
-
-	pollfd pollfd = {fd, POLLIN | POLLOUT, 0};
-	_pollfds.push_back(pollfd);
-
-	char hostname[NI_MAXHOST];
-	if (getnameinfo((struct sockaddr *)&s_address, sizeof(s_address), hostname, NI_MAXHOST, NULL, 0, NI_NUMERICSERV) != 0)
-		throw std::runtime_error("Error while getting hostname of new client.");
-
-	// Checks hostname size limit of 63 chars
-	std::string host(hostname);
-	if (host.length() > 63)
-		host = inet_ntoa(s_address.sin_addr);
-
-	std::cout << "Client connnected" << std::endl;
+    std::cout << "Client connected" << std::endl;
 }
 
-void Server::onClientDisconnect(int fd)
-{
-	// removing fd of leaving client from poll
-	_fdToDelete.push_back(fd);
-	std::cout << "Client has disconnected" << std::endl;
+void Server::onClientDisconnect(int fd) {
+    _fdToDelete.push_back(fd);
+    std::cout << "Client has disconnected" << std::endl;
 }
 
-void Server::onClientMessage(int fd)
-{
-	readMessage(fd);
+void Server::onClientMessage(int fd) {
+    readMessage(fd);
 }
 
-void Server::readMessage(int fd)
-{
-    int read_bytes = -10;
-	char buffer[BUFFER_SIZE + 1];
+void Server::readMessage(int fd) {
+    char buffer[BUFFER_SIZE + 1];
+    ssize_t read_bytes;
 
-	std::memset(buffer, 0, BUFFER_SIZE + 1);
-	while (read_bytes != 0)
-	{
-		bzero(buffer, BUFFER_SIZE);
-		read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
-		if (read_bytes < 0)
-			break;
-		buffer[read_bytes] = '\0';
-        std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
-	}
+    do {
+        read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
+        if (read_bytes < 0) {
+			_running = false;
+            break;
+        } else if (read_bytes == 0) {
+            onClientDisconnect(fd);
+            break;
+        } else {
+            buffer[read_bytes] = '\0';
+            std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
+        }
+    } while (read_bytes > 0);
 }
 
-void Server::deleteClient(int fd)
-{
-    for (pollfds_iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
-	{
-		if (it->fd == fd)
-		{
-			_pollfds.erase(it);
-			close(fd);
-			break;
-		}
-	}
+void Server::deleteDisconnectedClients() {
+    for (auto it = _fdToDelete.begin(); it != _fdToDelete.end(); ++it) {
+        int fd = *it;
+        for (auto it_poll = _pollfds.begin(); it_poll != _pollfds.end(); ++it_poll) {
+            if (it_poll->fd == fd) {
+                close(fd);
+                _pollfds.erase(it_poll);
+                break;
+            }
+        }
+    }
+    _fdToDelete.clear();
 }
 
-bool Server::running = true;
+bool Server::_running = true;

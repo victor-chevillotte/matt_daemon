@@ -20,10 +20,10 @@ class Server;
 
 class Server
 {
-	int							_sock;
 	const std::string			_host;
 	const std::string			_name;
 	const std::string			_port;
+	int							_sock;
 	std::vector<pollfd>			_pollfds;
     std::vector<int>            _fdToDelete;
 
@@ -31,10 +31,10 @@ public:
 
 	typedef std::vector<pollfd>::iterator 					pollfds_iterator;
 	
-	Server(const std::string port);
+	Server(const std::string& port);
 	~Server();
 
-	static bool 		running;
+	static bool 		_running;
 
 	void 				start();
 	int					newSocket();
@@ -43,5 +43,6 @@ public:
 	void				onClientDisconnect(int fd);
     void                readMessage(int fd);
     void                deleteClient(int fd);
+	void                deleteDisconnectedClients();
 
 };
