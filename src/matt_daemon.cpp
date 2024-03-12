@@ -1,5 +1,24 @@
 #include <iostream>
 #include<unistd.h>
+#include <csignal>
+
+
+void ft_exit(int status) {
+    exit(status);
+}
+
+void signalHandler( int signum ) {
+    std::cout << "Signal (" << signum << ") received.\n";
+    ft_exit(signum);
+}
+
+void set_signals() {
+    const int SIGNALS[] = {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGUSR1, SIGUSR2};
+    for (int i = 0; i < int(sizeof(SIGNALS) / sizeof(SIGNALS[0])); i++) {
+        signal(SIGNALS[i], signalHandler);
+    }
+}
+
 
 int main() {
     const int PORT = 4242;
@@ -22,7 +41,8 @@ int main() {
 
     std::cout << "Daemon process is running" << std::endl; 
   
-    // TODO: Catch signals
+    // Catch all signals
+    set_signals();
 
     // TODO: Create the socket
 
