@@ -1,6 +1,7 @@
 #include <iostream>
 #include<unistd.h>
 #include <csignal>
+#include "../inc/Server.hpp"
 
 
 void ft_exit(int status) {
@@ -44,9 +45,9 @@ int main() {
     // Catch all signals
     set_signals();
 
-    // TODO: Create the socket
-
-    // TODO: Bind the socket
+    // Create Server
+    Server server = Server(std::to_string(PORT));
+    server.start();
 
     std::cout << "Listening on port " << PORT << std::endl;
 
