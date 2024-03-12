@@ -12,25 +12,25 @@
 bool createDirectoryIfNotExists(const std::string& path) {
     DIR* dir = opendir(path.c_str());
     if (dir) {
-        // Le dossier existe.
+        // file exists
         closedir(dir);
         return true;
     } else if (ENOENT == errno) {
-        // Le dossier n'existe pas et doit être créé.
+        // file does not exist, create it
         if (mkdir(path.c_str(), 0755) == -1) {
-            std::cerr << "Erreur lors de la création du dossier" << std::endl;
+            std::cerr << "Error while creating log folder" << std::endl;
             return false;
         }
         return true;
     } else {
-        // Le dossier existe mais ne peut pas être ouvert (peut-être en raison de chmod 000).
+        // file exists but could not ne opened
         struct stat info;
         if (stat(path.c_str(), &info) != 0) {
             std::cerr << "Impossible d'accéder au dossier et de vérifier son existence " << std::endl;
             return false;
         }
         if (S_ISDIR(info.st_mode)) {
-            // Le dossier existe.
+            // file exists
             return true;
         }
         std::cerr << "Le chemin existe, mais ce n'est pas un dossier." << std::endl;
