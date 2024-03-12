@@ -50,11 +50,5 @@ int main() {
     server.start();
 
     std::cout << "Listening on port " << PORT << std::endl;
-
-    // TODO: Log loop
-    while (1) {
-        sleep(1);
-    }
-
     return 0;
 }
