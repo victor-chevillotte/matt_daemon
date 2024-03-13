@@ -113,6 +113,7 @@ void Server::onClientMessage(int fd) {
 void Server::readMessage(int fd) {
     char buffer[BUFFER_SIZE + 1];
     ssize_t read_bytes;
+    Tintin_reporter* reporter = Tintin_reporter::GetInstance();
 
     read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
     if (read_bytes < 0) {
@@ -122,6 +123,7 @@ void Server::readMessage(int fd) {
     } else {
         buffer[read_bytes] = '\0';
         std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
+        std::cout << reporter->format_message(buffer) << std::endl;
     }
 }
 
