@@ -122,10 +122,12 @@ void Server::readMessage(int fd) {
         onClientDisconnect(fd);
     } else {
         buffer[read_bytes] = '\0';
+        if (std::string(buffer) == "quit\n") {
+            _running = false;
+            return;
+        }
         std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
-        std::string formated_message = reporter->format_message(buffer);
-        std::cout << formated_message << std::endl;
-        reporter->log_to_file(formated_message);
+        reporter->log_to_file(buffer);
     }
 }
 

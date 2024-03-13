@@ -58,7 +58,8 @@ void    Tintin_reporter::log_to_file(const std::string& message) {
     }
     std::ofstream logFile("/home/vchevill/Documents/matt_daemon/log/matt_daemon.log", std::ios::app);
     if (logFile.is_open()) {
-        logFile << message;
+        std::string formated_message = format_message(message);
+        logFile << formated_message;
         logFile.close();
     } else {
         std::cerr << "Failed to open or create log file" << std::endl;
