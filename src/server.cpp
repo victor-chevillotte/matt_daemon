@@ -8,7 +8,6 @@
 Server::Server(const std::string& port)
     : _host("127.0.0.1"), _name("matt_daemon"), _port(port), _sock(-1) {
     _sock = newSocket();
-    // _pollfds.reserve(MAX_CONNECTIONS + 1);
 }
 
 Server::~Server() {
@@ -115,19 +114,15 @@ void Server::readMessage(int fd) {
     char buffer[BUFFER_SIZE + 1];
     ssize_t read_bytes;
 
-    do {
-        read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
-        if (read_bytes < 0) {
-			_running = false;
-            break;
-        } else if (read_bytes == 0) {
-            onClientDisconnect(fd);
-            break;
-        } else {
-            buffer[read_bytes] = '\0';
-            std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
-        }
-    } while (read_bytes > 0);
+    read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
+    if (read_bytes < 0) {
+        _running = false;
+    } else if (read_bytes == 0) {
+        onClientDisconnect(fd);
+    } else {
+        buffer[read_bytes] = '\0';
+        std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
+    }
 }
 
 
