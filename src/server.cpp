@@ -51,6 +51,11 @@ void Server::start() {
         addConnectedClients();
         deleteDisconnectedClients();
     }
+    // Close all sockets before exiting
+    for (pollfds_iterator it = _pollfds.begin(); it != _pollfds.end(); ++it) {
+        close(it->fd);
+    }
+    close(_sock);
 }
 
 int Server::newSocket() {
@@ -90,6 +95,11 @@ void Server::onClientConnect() {
     int fd = accept(_sock, (sockaddr *)&s_address, &s_size);
     if (fd < 0) {
         throw std::runtime_error("Error while accepting new client.");
+    }
+    if (_pollfds.size() > 3) {
+        std::cout << "Max active connections reached." << std::endl;
+        close(fd);
+        return;
     }
 
     pollfd pollfd = {fd, POLLIN | POLLOUT, 0};
