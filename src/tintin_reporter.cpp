@@ -1,11 +1,11 @@
 #include "../inc/tintin_reporter.hpp"
 
 Tintin_reporter::Tintin_reporter() {
-    std::cout << "Tintin reporter created" << std::endl;
+    // std::cout << "Tintin reporter created" << std::endl;
 }
 
 Tintin_reporter::~Tintin_reporter() {
-    std::cout << "Tintin reporter destroyed" << std::endl;
+    // std::cout << "Tintin reporter destroyed" << std::endl;
 }
 
 
