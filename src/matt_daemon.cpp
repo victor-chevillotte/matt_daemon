@@ -50,6 +50,11 @@ int main() {
         return 1;
     }
 
+    reporter->log_to_file("INFO", "Creating server\n");
+    Server server = Server(std::to_string(PORT));
+    reporter->log_to_file("INFO", "Server created\n");
+
+
     reporter->log_to_file("INFO", "Entering daemon mode\n");
     // Fork the process and quit the parent process, leaving child process as daemon
     pid_t c_pid = fork(); 
@@ -60,15 +65,10 @@ int main() {
     else if (c_pid > 0) { 
         exit(EXIT_SUCCESS);
     }
-
-    // Catch all signals
-    set_signals();
-    
     reporter->log_to_file("INFO", "Started. PID: " + std::to_string(getpid()) + "\n");
   
-    reporter->log_to_file("INFO", "Creating server\n");
-    Server server = Server(std::to_string(PORT));
-    reporter->log_to_file("INFO", "Server created\n");
+    // Catch all signals
+    set_signals();
 
     server.start();
     
