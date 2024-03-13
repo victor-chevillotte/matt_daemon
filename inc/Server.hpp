@@ -12,6 +12,7 @@
 #include <unistd.h> // close
 #include <arpa/inet.h> /* htons et inet_aton */
 #include <netdb.h>
+#include "../inc/tintin_reporter.hpp"
 
 #define BUFFER_SIZE 10000
 #define MAX_CONNECTIONS 3

@@ -9,16 +9,16 @@ Tintin_reporter::~Tintin_reporter() {
 }
 
 
-std::string Tintin_reporter::_format_message(const std::string& message) {
+std::string Tintin_reporter::format_message(const std::string& message) {
     // Time format : DD / MM / YYYY - HH : MM : SS
+    time_t now = time(0);
+    struct tm tstruct;
+    char buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%d/%m/%Y - %X", &tstruct);
+    return "[" + std::string(buf) + "] " + message;
 }
 
 void    Tintin_reporter::log_to_file(const std::string& message) {
-    std::ofstream log_file(log_file_path, std::ios::app);
-    if (log_file.is_open()) {
-        log_file << _format_message(message) << std::endl;
-        log_file.close();
-    } else {
-        std::cerr << "Failed to open log file" << std::endl;
-    }
+    (void)message;
 }
