@@ -1,5 +1,5 @@
 
-NAME			:= matt_daemon
+NAME			:=  Matt_daemon
 
 CXXFLAGS		:= -Wall -Werror -Wextra -g3
 

@@ -123,6 +123,8 @@ void Server::readMessage(int fd) {
     } else {
         buffer[read_bytes] = '\0';
         if (std::string(buffer) == "quit\n") {
+            Tintin_reporter* reporter = Tintin_reporter::GetInstance();
+            reporter->log_to_file("INFO", "Request quit.\n");
             _running = false;
             return;
         }

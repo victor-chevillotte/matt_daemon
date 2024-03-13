@@ -8,10 +8,15 @@
 
 
 void ft_exit(int status) {
-    Server::_running = false;
+    
     Tintin_reporter* reporter = Tintin_reporter::GetInstance();
-    reporter->log_to_file("INFO", "Quitting.\n");
-    remove("/var/lock/matt_daemon.lock");
+    reporter->log_to_file("INFO", "Quitting.\n"); //not working
+    try {
+        std::remove("/var/lock/matt_daemon.lock");
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+    Server::_running = false;
     exit(status);
 }
 
