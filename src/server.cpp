@@ -51,8 +51,6 @@ void Server::start() {
         addConnectedClients();
         deleteDisconnectedClients();
     }
-
-    std::cout << "Server has been turned down. Goodbye !" << std::endl;
 }
 
 int Server::newSocket() {
@@ -83,7 +81,6 @@ int Server::newSocket() {
         throw std::runtime_error("Error while listening on socket.");
     }
 
-    std::cout << "Server is listening on port " << _port << ", with sock : " << sockfd << std::endl;
     return sockfd;
 }
 

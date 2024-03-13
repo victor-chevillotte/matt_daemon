@@ -21,7 +21,6 @@ void ft_exit(int status) {
 }
 
 void signalHandler( int signum ) {
-    std::cout << "Signal (" << signum << ") received.\n";
     Tintin_reporter* reporter = Tintin_reporter::GetInstance();
     reporter->log_to_file("INFO", "Signal handler.\n");
     ft_exit(signum);
