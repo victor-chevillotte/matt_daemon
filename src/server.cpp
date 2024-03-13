@@ -8,7 +8,7 @@
 Server::Server(const std::string& port)
     : _host("127.0.0.1"), _name("matt_daemon"), _port(port), _sock(-1) {
     _sock = newSocket();
-    _pollfds.reserve(MAX_CONNECTIONS + 1);
+    // _pollfds.reserve(MAX_CONNECTIONS + 1);
 }
 
 Server::~Server() {
@@ -49,7 +49,7 @@ void Server::start() {
                 }
             }
         }
-
+        addConnectedClients();
         deleteDisconnectedClients();
     }
 
@@ -97,7 +97,7 @@ void Server::onClientConnect() {
     }
 
     pollfd pollfd = {fd, POLLIN | POLLOUT, 0};
-    _pollfds.push_back(pollfd);
+    _pollfdsToAdd.push_back(pollfd);
 
     std::cout << "Client connected" << std::endl;
 }
@@ -129,6 +129,15 @@ void Server::readMessage(int fd) {
         }
     } while (read_bytes > 0);
 }
+
+
+void Server::addConnectedClients() {
+    for (auto it = _pollfdsToAdd.begin(); it != _pollfdsToAdd.end(); ++it) {
+        _pollfds.push_back(*it);
+    }
+    _pollfdsToAdd.clear();
+}
+
 
 void Server::deleteDisconnectedClients() {
     for (auto it = _fdToDelete.begin(); it != _fdToDelete.end(); ++it) {

@@ -26,6 +26,7 @@ class Server
 	int							_sock;
 	std::vector<pollfd>			_pollfds;
     std::vector<int>            _fdToDelete;
+	std::vector<pollfd> 	    _pollfdsToAdd;
 
 public:
 
@@ -42,6 +43,7 @@ public:
 	void				onClientMessage(int fd);
 	void				onClientDisconnect(int fd);
     void                readMessage(int fd);
+	void				addConnectedClients();
 	void                deleteDisconnectedClients();
 
 };
