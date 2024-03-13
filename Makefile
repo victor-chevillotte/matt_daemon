@@ -1,7 +1,7 @@
 
 NAME			:=  Matt_daemon
 
-CXXFLAGS		:= -Wall -Werror -Wextra -g3
+CXXFLAGS		:= -Wall -Werror -Wextra -g3 -std=c++11
 
 DEBUG			:= -fsanitize=address
 
