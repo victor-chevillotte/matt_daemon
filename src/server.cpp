@@ -8,6 +8,7 @@
 Server::Server(const std::string& port)
     : _host("127.0.0.1"), _name("matt_daemon"), _port(port), _sock(-1) {
     _sock = newSocket();
+    _pollfds.reserve(MAX_CONNECTIONS + 1);
 }
 
 Server::~Server() {

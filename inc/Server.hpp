@@ -42,7 +42,6 @@ public:
 	void				onClientMessage(int fd);
 	void				onClientDisconnect(int fd);
     void                readMessage(int fd);
-    void                deleteClient(int fd);
 	void                deleteDisconnectedClients();
 
 };
