@@ -1,13 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <sys/stat.h>
-#include<unistd.h>
+#include <unistd.h>
 #include <csignal>
 #include <ctime>
 #include <iostream>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <errno.h>
+#include "../inc/Server.hpp"
 
 bool createDirectoryIfNotExists(const std::string& path) {
     DIR* dir = opendir(path.c_str());
@@ -38,7 +39,11 @@ bool createDirectoryIfNotExists(const std::string& path) {
     }
 }
 
+
+
 void ft_exit(int status) {
+    Server::_running = false;
+    remove("/var/lock/matt_daemon.lock");
     exit(status);
 }
 
@@ -81,7 +86,8 @@ bool is_file_existing(const std::string& name) {
 }
 
 int main() {
-    const int PORT = 4242;
+    // TODO: Replace with 4242
+    const int PORT = 4343;
     std::cout << "Matt Daemon" << std::endl;
     write_log("Started");
 
@@ -120,19 +126,8 @@ int main() {
     // Catch all signals
     set_signals();
 
-    // TODO: Create the socket
-
-    // TODO: Bind the socket
-
-    std::cout << "Listening on port " << PORT << std::endl;
-
-    // TODO: Log loop
-    while (1) {
-        sleep(1);
-        
-    }
-
-    // delete lock file
-
+    // Create Server
+    Server server = Server(std::to_string(PORT));
+    server.start();
     return 0;
 }
