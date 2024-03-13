@@ -6,13 +6,15 @@
 #include <errno.h>
 #include "../inc/Server.hpp"
 
+//TODO: Replace with /var/lock/matt_daemon.lock
+#define LOCK_FILE "/tmp/lock/matt_daemon.lock"
 
 void ft_exit(int status) {
     
     Tintin_reporter* reporter = Tintin_reporter::GetInstance();
     reporter->log_to_file("INFO", "Quitting.\n"); //not working
     try {
-        std::remove("/var/lock/matt_daemon.lock");
+        std::remove(LOCK_FILE);
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
     }
@@ -40,11 +42,11 @@ int main() {
     reporter->log_to_file("INFO", "Started.\n");    
 
     // create lock file
-    std::ofstream newLockFile("/var/lock/matt_daemon.lock");
+    std::ofstream newLockFile(LOCK_FILE);
     if (newLockFile.is_open()) {
         newLockFile.close();
     } else {
-        std::cerr << "Can't open :/var/lock/matt_daemon.lock" << std::endl;
+        std::cerr << "Can't open :" << LOCK_FILE << std::endl;
         reporter->log_to_file("ERROR", "Error File locked\n");
         return 1;
     }
