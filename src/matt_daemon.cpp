@@ -49,8 +49,7 @@ int main() {
         reporter->log_to_file("ERROR", "Error File locked\n");
         return 1;
     }
-    reporter->log_to_file("INFO", "Creating server\n");
-    reporter->log_to_file("INFO", "Server created\n");
+
     reporter->log_to_file("INFO", "Entering daemon mode\n");
     // Fork the process and quit the parent process, leaving child process as daemon
     pid_t c_pid = fork(); 
@@ -59,17 +58,19 @@ int main() {
         exit(EXIT_FAILURE); 
     } 
     else if (c_pid > 0) { 
-        std::cout << "Parent process is exiting" << std::endl;
         exit(EXIT_SUCCESS);
-    } 
-    reporter->log_to_file("INFO", "Started. PID: " + std::to_string(getpid()) + "\n");
-    std::cout << "Daemon process is running" << std::endl; 
-  
+    }
+
     // Catch all signals
     set_signals();
-
-    // Create Server
+    
+    reporter->log_to_file("INFO", "Started. PID: " + std::to_string(getpid()) + "\n");
+  
+    reporter->log_to_file("INFO", "Creating server\n");
     Server server = Server(std::to_string(PORT));
+    reporter->log_to_file("INFO", "Server created\n");
+
     server.start();
+    
     return 0;
 }
