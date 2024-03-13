@@ -9,14 +9,14 @@ Tintin_reporter::~Tintin_reporter() {
 }
 
 
-std::string Tintin_reporter::format_message(const std::string& message) {
+std::string Tintin_reporter::format_message(const std::string& log_level, const std::string& message) {
     // Time format : DD / MM / YYYY - HH : MM : SS
     time_t now = time(0);
     struct tm tstruct;
     char buf[80];
     tstruct = *localtime(&now);
-    strftime(buf, sizeof(buf), "%d/%m/%Y - %X", &tstruct);
-    return "[" + std::string(buf) + "] " + message;
+    strftime(buf, sizeof(buf), "%d/%m/%Y-%X", &tstruct);
+    return "[" + std::string(buf) + "] " + "[ " + log_level  + " ] - Matt_deamon: " + message;
 }
 
 bool    Tintin_reporter::create_directory_if_not_exists(const std::string& path) {
@@ -48,7 +48,7 @@ bool    Tintin_reporter::create_directory_if_not_exists(const std::string& path)
     }
 }
 
-void    Tintin_reporter::log_to_file(const std::string& message) {
+void    Tintin_reporter::log_to_file(const std::string& log_level, const std::string& message) {
      // create log file if does not exists 
     // write to log file with format [TIMESTAMP] message
     // /var/log/matt_daemon is existng directory ?
@@ -58,7 +58,7 @@ void    Tintin_reporter::log_to_file(const std::string& message) {
     }
     std::ofstream logFile("/home/vchevill/Documents/matt_daemon/log/matt_daemon.log", std::ios::app);
     if (logFile.is_open()) {
-        std::string formated_message = format_message(message);
+        std::string formated_message = format_message(log_level, message);
         logFile << formated_message;
         logFile.close();
     } else {

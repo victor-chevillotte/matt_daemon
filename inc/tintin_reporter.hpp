@@ -24,8 +24,8 @@ public:
 
     ~Tintin_reporter();
 
-    void log_to_file(const std::string& message);
-    std::string format_message(const std::string& message);
+    void log_to_file(const std::string& log_level, const std::string& message);
+    std::string format_message(const std::string& log_level, const std::string& message);
     bool create_directory_if_not_exists(const std::string& path);
 
 };

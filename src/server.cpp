@@ -127,7 +127,8 @@ void Server::readMessage(int fd) {
             return;
         }
         std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
-        reporter->log_to_file(buffer);
+        std::string message = "User input: " + std::string(buffer);
+        reporter->log_to_file("LOG", message);
     }
 }
 

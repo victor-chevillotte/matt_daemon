@@ -9,12 +9,16 @@
 
 void ft_exit(int status) {
     Server::_running = false;
+    Tintin_reporter* reporter = Tintin_reporter::GetInstance();
+    reporter->log_to_file("INFO", "Quitting.\n");
     remove("/var/lock/matt_daemon.lock");
     exit(status);
 }
 
 void signalHandler( int signum ) {
     std::cout << "Signal (" << signum << ") received.\n";
+    Tintin_reporter* reporter = Tintin_reporter::GetInstance();
+    reporter->log_to_file("INFO", "Signal handler.");
     ft_exit(signum);
 }
 
@@ -29,7 +33,7 @@ int main() {
     // TODO: Replace with 4242
     const int PORT = 4343;
     Tintin_reporter* reporter = Tintin_reporter::GetInstance();
-    reporter->log_to_file("Started.\n");    
+    reporter->log_to_file("INFO", "Started.\n");    
 
     // create lock file
     std::ofstream newLockFile("/var/lock/matt_daemon.lock");
@@ -37,12 +41,12 @@ int main() {
         newLockFile.close();
     } else {
         std::cerr << "Can't open :/var/lock/matt_daemon.lock" << std::endl;
-        reporter->log_to_file("Error File locked\n");
+        reporter->log_to_file("ERROR", "Error File locked\n");
         return 1;
     }
-    reporter->log_to_file("Creating server\n");
-    reporter->log_to_file("Server created\n");
-    reporter->log_to_file("Entering daemon mode\n");
+    reporter->log_to_file("INFO", "Creating server\n");
+    reporter->log_to_file("INFO", "Server created\n");
+    reporter->log_to_file("INFO", "Entering daemon mode\n");
     // Fork the process and quit the parent process, leaving child process as daemon
     pid_t c_pid = fork(); 
     if (c_pid == -1) { 
@@ -53,7 +57,7 @@ int main() {
         std::cout << "Parent process is exiting" << std::endl;
         exit(EXIT_SUCCESS);
     } 
-    reporter->log_to_file("Started. PID: " + std::to_string(getpid()) + "\n");
+    reporter->log_to_file("INFO", "Started. PID: " + std::to_string(getpid()) + "\n");
     std::cout << "Daemon process is running" << std::endl; 
   
     // Catch all signals
