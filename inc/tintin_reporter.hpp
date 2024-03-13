@@ -1,6 +1,9 @@
 #include <ctime>
 #include <iostream>
-
+#include <sys/stat.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fstream>
 
 class Tintin_reporter
 {
@@ -23,5 +26,6 @@ public:
 
     void log_to_file(const std::string& message);
     std::string format_message(const std::string& message);
+    bool create_directory_if_not_exists(const std::string& path);
 
 };

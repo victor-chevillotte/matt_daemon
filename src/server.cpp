@@ -123,7 +123,9 @@ void Server::readMessage(int fd) {
     } else {
         buffer[read_bytes] = '\0';
         std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
-        std::cout << reporter->format_message(buffer) << std::endl;
+        std::string formated_message = reporter->format_message(buffer);
+        std::cout << formated_message << std::endl;
+        reporter->log_to_file(formated_message);
     }
 }
 

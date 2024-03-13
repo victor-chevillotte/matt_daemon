@@ -19,8 +19,50 @@ std::string Tintin_reporter::format_message(const std::string& message) {
     return "[" + std::string(buf) + "] " + message;
 }
 
+bool    Tintin_reporter::create_directory_if_not_exists(const std::string& path) {
+    DIR* dir = opendir(path.c_str());
+    if (dir) {
+        // directory exists
+        closedir(dir);
+        return true;
+    } else if (ENOENT == errno) {
+        // directory does not exist, create it
+        if (mkdir(path.c_str(), 0755) == -1) {
+            std::cerr << "Error while creating log folder" << std::endl;
+            return false;
+        }
+        return true;
+    } else {
+        // directory exists but could not ne opened
+        struct stat info;
+        if (stat(path.c_str(), &info) != 0) {
+            std::cerr << "Error while accessing directory and checking its existence " << std::endl;
+            return false;
+        }
+        if (S_ISDIR(info.st_mode)) {
+            // file exists
+            return true;
+        }
+        std::cerr << "The path exists, but it is not a directory." << std::endl;
+        return false;
+    }
+}
+
 void    Tintin_reporter::log_to_file(const std::string& message) {
-    (void)message;
+     // create log file if does not exists 
+    // write to log file with format [TIMESTAMP] message
+    // /var/log/matt_daemon is existng directory ?
+    bool directory_success = create_directory_if_not_exists("/home/vchevill/Documents/matt_daemon/log");
+    if (!directory_success) {
+       return;
+    }
+    std::ofstream logFile("/home/vchevill/Documents/matt_daemon/log/matt_daemon.log", std::ios::app);
+    if (logFile.is_open()) {
+        logFile << message << std::endl;
+        logFile.close();
+    } else {
+        std::cerr << "Failed to open or create log file" << std::endl;
+    }
 }
 
 Tintin_reporter* Tintin_reporter::reporter_instance= nullptr;;
