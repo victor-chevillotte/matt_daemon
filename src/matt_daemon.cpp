@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include<unistd.h>
 #include <csignal>
+#include "../inc/Server.hpp"
 
 
 void ft_exit(int status) {
@@ -29,7 +30,8 @@ bool is_file_existing(const std::string& name) {
 }
 
 int main() {
-    const int PORT = 4242;
+    // TODO: Replace with 4242
+    const int PORT = 4343;
     std::cout << "Matt Daemon" << std::endl;
 
     // Check if the lock file exists and quit if it does
@@ -58,6 +60,7 @@ int main() {
         perror("fork"); 
         exit(EXIT_FAILURE); 
     } 
+    // TODO: Replace with c_pid > 0 when server is fixed 
     else if (c_pid > 0) { 
         std::cout << "Parent process is exiting" << std::endl;
         exit(EXIT_SUCCESS);
@@ -68,16 +71,10 @@ int main() {
     // Catch all signals
     set_signals();
 
-    // TODO: Create the socket
-
-    // TODO: Bind the socket
+    // Create Server
+    Server server = Server(std::to_string(PORT));
+    server.start();
 
     std::cout << "Listening on port " << PORT << std::endl;
-
-    // TODO: Log loop
-    while (1) {
-        sleep(1);
-    }
-
     return 0;
 }
