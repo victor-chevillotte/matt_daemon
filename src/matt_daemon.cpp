@@ -1,12 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <sys/stat.h>
-#include<unistd.h>
+#include <unistd.h>
 #include <csignal>
 #include "../inc/Server.hpp"
 
 
 void ft_exit(int status) {
+    Server::_running = false;
+    remove("/var/lock/matt_daemon.lock");
     exit(status);
 }
 
@@ -45,7 +47,7 @@ int main() {
     }
 
 
-    // create lock file
+    // Create lock file
     std::ofstream newLockFile("/var/lock/matt_daemon.lock");
     if (newLockFile.is_open()) {
         newLockFile.close();
@@ -60,7 +62,6 @@ int main() {
         perror("fork"); 
         exit(EXIT_FAILURE); 
     } 
-    // TODO: Replace with c_pid > 0 when server is fixed 
     else if (c_pid > 0) { 
         std::cout << "Parent process is exiting" << std::endl;
         exit(EXIT_SUCCESS);
@@ -74,7 +75,5 @@ int main() {
     // Create Server
     Server server = Server(std::to_string(PORT));
     server.start();
-
-    std::cout << "Listening on port " << PORT << std::endl;
     return 0;
 }
