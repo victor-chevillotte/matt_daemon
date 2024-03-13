@@ -1,4 +1,7 @@
 #include "../inc/tintin_reporter.hpp"
+#define LOG_FILE_PATH "/tmp/log/matt_daemon.log"
+#define LOG_FOLDER_PATH "/tmp/log/"
+
 
 Tintin_reporter::Tintin_reporter() {
 }
@@ -50,11 +53,11 @@ void    Tintin_reporter::log_to_file(const std::string& log_level, const std::st
      // create log file if does not exists 
     // write to log file with format [TIMESTAMP] message
     // /var/log/matt_daemon is existng directory ?
-    bool directory_success = create_directory_if_not_exists("/home/vchevill/Documents/matt_daemon/log");
+    bool directory_success = create_directory_if_not_exists(LOG_FOLDER_PATH);
     if (!directory_success) {
        return;
     }
-    std::ofstream logFile("/home/vchevill/Documents/matt_daemon/log/matt_daemon.log", std::ios::app);
+    std::ofstream logFile(LOG_FILE_PATH, std::ios::app);
     if (logFile.is_open()) {
         std::string formated_message = format_message(log_level, message);
         logFile << formated_message;
