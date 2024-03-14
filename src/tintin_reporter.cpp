@@ -1,6 +1,6 @@
 #include "../inc/tintin_reporter.hpp"
-#define LOG_FILE_PATH "/tmp/log/matt_daemon.log"
-#define LOG_FOLDER_PATH "/tmp/log/"
+#define LOG_FILE_PATH "/var/log/matt_daemon.log"
+#define LOG_FOLDER_PATH "/var/log/"
 
 // default constructor
 Tintin_reporter::Tintin_reporter() {
@@ -74,7 +74,7 @@ void    Tintin_reporter::log_to_file(const std::string& log_level, const std::st
         logFile << formated_message;
         logFile.close();
     } else {
-        std::cerr << "Failed to open or create log file" << std::endl;
+        std::cerr << "Failed to open or create log file with path: " << LOG_FILE_PATH << std::endl;
     }
 }
 
