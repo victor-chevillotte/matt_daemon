@@ -55,7 +55,6 @@ int main() {
     Server server = Server(std::to_string(PORT));
     reporter->log_to_file("INFO", "Server created\n");
 
-
     reporter->log_to_file("INFO", "Entering daemon mode\n");
     // Fork the process and quit the parent process, leaving child process as daemon
     pid_t c_pid = fork(); 

@@ -21,9 +21,9 @@ class Server;
 
 class Server
 {
-	const std::string			_host;
-	const std::string			_name;
-	const std::string			_port;
+	std::string					_host;
+	std::string					_name;
+	std::string					_port;
 	int							_sock;
 	std::vector<pollfd>			_pollfds;
     std::vector<int>            _fdToDelete;
@@ -33,12 +33,18 @@ class Server
 public:
 
 	typedef std::vector<pollfd>::iterator 					pollfds_iterator;
-	
+
+	Server();
 	Server(const std::string& port);
+	Server(const Server &src);
 	~Server();
 
 	static bool 		_running;
 
+	
+
+	Server& 			operator=(const Server &src);
+	
 	void 				start();
 	int					newSocket();
 	void				onClientConnect();

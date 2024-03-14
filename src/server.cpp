@@ -5,16 +5,42 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
+// default constructor
+Server::Server()  : _host("127.0.0.1"), _name("matt_daemon"), _port("4242"), _sock(-1) {
+    _sock = newSocket();
+}
+
+// main constructor
 Server::Server(const std::string& port)
     : _host("127.0.0.1"), _name("matt_daemon"), _port(port), _sock(-1) {
     _sock = newSocket();
 }
 
+// destructor
 Server::~Server() {
     if (_sock != -1) {
         close(_sock);
     }
 }
+
+// copy constructor
+Server::Server(const Server& other) :
+    _host(other._host), _name(other._name), _port(other._port), _sock(other._sock), _pollfds(other._pollfds), _fdToDelete(other._fdToDelete), _pollfdsToAdd(other._pollfdsToAdd) {
+}
+
+// assignment operator
+Server&	Server::operator=(const Server& rhs) {
+    _host = rhs._host;
+    _name = rhs._name;
+    _port = rhs._port;
+    _sock = rhs._sock;
+    _pollfds = rhs._pollfds;
+    _fdToDelete = rhs._fdToDelete;
+    _pollfdsToAdd = rhs._pollfdsToAdd;
+	return *this ;
+}
+
+//methods
 
 void Server::start() {
     if (_sock == -1) {
