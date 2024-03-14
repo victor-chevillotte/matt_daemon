@@ -144,39 +144,24 @@ void Server::readMessage(int fd) {
     char buffer[BUFFER_SIZE + 1];
     ssize_t read_bytes;
     std::string fullMessage;
-    while (true) {
-        // Réinitialisez la mémoire du buffer pour éviter toute donnée résiduelle
+    do {
         memset(buffer, 0, sizeof(buffer));
+        read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
 
-        // Lisez jusqu'à 50 caractères à la fois
-        read_bytes = recv(fd, buffer, 50, 0);
-        std::cout << "Read bytes: " << read_bytes << std::endl;
-        // si \n a la lfin de buffer break
-        std::cout << "Buffer:" << buffer << "===" << std::endl;
-        std::cout << "Buffer last char:" << buffer[read_bytes - 1] << std::endl;
-
-
-        // Si recv renvoie 0, le client a fermé la connexion
         if (read_bytes == 0) {
             onClientDisconnect(fd);
-            break; // Sortie de la boucle, fin de la lecture
+            return;
         }
 
-        // Si recv renvoie -1, une erreur s'est produite
         if (read_bytes < 0) {
             std::cerr << "Error while reading from client " << fd << "." << std::endl;
             _running = false;
-            return; // Sortie de la fonction, erreur de lecture
+            return;
         }
 
-        // Ajoutez les données reçues à fullMessage
         fullMessage = fullMessage + std::string(buffer);
 
-        if (buffer[read_bytes - 1] == '\n') {
-            std::cout << "End of message" << std::endl;
-            break;
-        }
-    }
+    } while (buffer[read_bytes - 1] != '\n');
 
     if (fullMessage == "quit\n") {
         ft_log("INFO", "Request quit.\n");
