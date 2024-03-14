@@ -3,12 +3,13 @@
 #include <unistd.h>
 #include <csignal>
 #include <sys/stat.h>
+#include <sys/file.h>
 #include <errno.h>
 #include "../inc/Server.hpp"
 #include "../inc/utils.hpp"
 
 //TODO: Replace with /var/lock/matt_daemon.lock
-#define LOCK_FILE "/tmp/lock/matt_daemon.lock"
+#define LOCK_FILE "/var/lock/matt_daemon.lock"
 
 
 
@@ -48,24 +49,30 @@ bool is_file_existing(const std::string& name) {
 
 
 int main() {
-    // TODO: Replace with 4242
-    const int PORT = 4343;
+    const int PORT = 4242;
 
     ft_log("INFO", "Started.\n");    
 
-    // Check if lock file exists
-    if (is_file_existing(LOCK_FILE)) {
-        std::cerr << "Can't open :" << LOCK_FILE << std::endl;
-        ft_log("ERROR", "Error File locked\n");
+    // Run as root
+    if (getuid() != 0) {
+        std::cerr << "You must be root to run this program." << std::endl;
+        ft_log("ERROR", "You must be root to run this program.\n");
         return 1;
     }
+    setreuid(geteuid(), getuid());
 
-    // create lock file
-    std::ofstream newLockFile(LOCK_FILE);
-    if (newLockFile.is_open()) {
-        newLockFile.close();
-    } else {
-        std::cerr << "Lock file already exists or folder lock not created." << std::endl;
+    // Lock file
+    ft_log("DEBUG", "Opening file lock.\n");
+    int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
+    if (fd == -1) {
+        std::cerr << "Can't open :" << LOCK_FILE << std::endl;
+        ft_log("ERROR", "Can't open :" + std::string(LOCK_FILE) + "\n");
+        return 1;
+    }
+    int rc = flock(fd, LOCK_EX | LOCK_NB); 
+    if (rc == -1 && errno == EWOULDBLOCK)
+    {
+        std::cerr << "Lock file already exists." << std::endl;
         ft_log("ERROR", "Error File locked\n");
         return 1;
     }
@@ -85,6 +92,7 @@ int main() {
         else if (c_pid > 0) { 
             exit(EXIT_SUCCESS);
         }
+
         ft_log("INFO", "Started. PID: " + std::to_string(getpid()) + "\n");
     
         // Catch all signals
