@@ -81,7 +81,7 @@ int Server::newSocket() {
         throw std::runtime_error("Error while setting socket IP address and port.");
     }
 
-    if (listen(sockfd, MAX_CONNECTIONS) < 0) {
+    if (listen(sockfd, MAX_CONNECTIONS_POOL) < 0) {
         close(sockfd);
         throw std::runtime_error("Error while listening on socket.");
     }

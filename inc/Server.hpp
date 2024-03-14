@@ -15,7 +15,7 @@
 #include "../inc/tintin_reporter.hpp"
 
 #define BUFFER_SIZE 10000
-#define MAX_CONNECTIONS 3
+#define MAX_CONNECTIONS_POOL 3
 
 class Server;
 
@@ -28,6 +28,7 @@ class Server
 	std::vector<pollfd>			_pollfds;
     std::vector<int>            _fdToDelete;
 	std::vector<pollfd> 	    _pollfdsToAdd;
+
 
 public:
 
