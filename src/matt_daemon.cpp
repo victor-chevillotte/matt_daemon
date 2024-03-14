@@ -18,6 +18,7 @@ void ft_exit(int status) {
     try {
         std::remove(LOCK_FILE);
     } catch (const std::exception& e) {
+        ft_log("ERROR", "Error removing lock file.\n");
         std::cerr << e.what() << std::endl;
     }
     Server::_running = false;
@@ -90,11 +91,12 @@ int main() {
         set_signals();
 
         server.start();
+        ft_exit(0);
 
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         ft_log("ERROR", "Server runtime error.\n");
-        return 1;
+        ft_exit(1);
     }
     
     return 0;
