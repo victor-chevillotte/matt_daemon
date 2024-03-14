@@ -11,7 +11,7 @@ Tintin_reporter::~Tintin_reporter() {
 }
 
 // copy constructor
-Tintin_reporter::Tintin_reporter(const Tintin_reporter& other) : {
+Tintin_reporter::Tintin_reporter(const Tintin_reporter& other) {
     reporter_instance = other.reporter_instance;
 }
 
