@@ -65,7 +65,7 @@ int main() {
     if (newLockFile.is_open()) {
         newLockFile.close();
     } else {
-        std::cerr << "Lock file already exists." << std::endl;
+        std::cerr << "Lock file already exists or folder lock not created." << std::endl;
         ft_log("ERROR", "Error File locked\n");
         return 1;
     }
