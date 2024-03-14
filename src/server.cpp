@@ -143,23 +143,34 @@ void Server::onClientMessage(int fd) {
 void Server::readMessage(int fd) {
     char buffer[BUFFER_SIZE + 1];
     ssize_t read_bytes;
+    std::string fullMessage;
+    do {
+        memset(buffer, 0, sizeof(buffer));
+        read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
 
-    read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
-    if (read_bytes < 0) {
-        _running = false;
-    } else if (read_bytes == 0) {
-        onClientDisconnect(fd);
-    } else {
-        buffer[read_bytes] = '\0';
-        if (std::string(buffer) == "quit\n") {
-            ft_log("INFO", "Request quit.\n");
+        if (read_bytes == 0) {
+            onClientDisconnect(fd);
+            return;
+        }
+
+        if (read_bytes < 0) {
+            std::cerr << "Error while reading from client " << fd << "." << std::endl;
             _running = false;
             return;
         }
-        std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
-        std::string message = "User input: " + std::string(buffer);
-        ft_log("LOG", message);
+
+        fullMessage = fullMessage + std::string(buffer);
+
+    } while (buffer[read_bytes - 1] != '\n');
+
+    if (fullMessage == "quit\n") {
+        ft_log("INFO", "Request quit.\n");
+        _running = false;
+        return;
     }
+    std::cout << "Message received from client " << fd << ": " << fullMessage << std::endl;
+    std::string message = "User input: " + std::string(fullMessage);
+    ft_log("LOG", message);
 }
 
 
