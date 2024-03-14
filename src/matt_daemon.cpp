@@ -52,7 +52,7 @@ int main() {
 
     // Check if lock file exists
     if (is_file_existing(LOCK_FILE)) {
-        std::cerr << "Error: File locked\n";
+        std::cerr << "Can't open :" << LOCK_FILE << std::endl;
         reporter->log_to_file("ERROR", "Error File locked\n");
         return 1;
     }
