@@ -8,7 +8,7 @@
 #include "../inc/utils.hpp"
 
 //TODO: Replace with /var/lock/matt_daemon.lock
-#define LOCK_FILE "/tmp/lock/matt_daemon.lock"
+#define LOCK_FILE "/var/lock/matt_daemon.lock"
 
 
 
@@ -49,7 +49,7 @@ bool is_file_existing(const std::string& name) {
 
 int main() {
     // TODO: Replace with 4242
-    const int PORT = 4343;
+    const int PORT = 4242;
 
     ft_log("INFO", "Started.\n");    
 
