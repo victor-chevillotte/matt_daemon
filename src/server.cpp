@@ -120,7 +120,8 @@ void Server::onClientConnect() {
     socklen_t s_size = sizeof(s_address);
     int fd = accept(_sock, (sockaddr *)&s_address, &s_size);
     if (fd < 0) {
-        throw std::runtime_error("Error while accepting new client.");
+        std::cerr << "Error while accepting new client." << std::endl;
+        return;
     }
     if (_pollfds.size() > 3) {
         std::cout << "Max active connections reached." << std::endl;
