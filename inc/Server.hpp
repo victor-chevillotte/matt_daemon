@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <map>
 #include <vector>
 #include <poll.h>
@@ -11,8 +12,10 @@
 #include <utility> // std::make_pair
 #include <unistd.h> // close
 #include <arpa/inet.h> /* htons et inet_aton */
+#include <stdexcept>
 #include <netdb.h>
 #include "../inc/tintin_reporter.hpp"
+#include "../inc/utils.hpp"
 
 #define BUFFER_SIZE 10000
 #define MAX_CONNECTIONS_POOL 3

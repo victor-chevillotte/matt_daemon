@@ -1,9 +1,5 @@
 #include "../inc/Server.hpp"
-#include <iostream>
-#include <cstring>
-#include <stdexcept>
-#include <unistd.h>
-#include <sys/socket.h>
+
 
 // default constructor
 Server::Server()  : _host("127.0.0.1"), _name("matt_daemon"), _port("4242"), _sock(-1) {
@@ -147,7 +143,6 @@ void Server::onClientMessage(int fd) {
 void Server::readMessage(int fd) {
     char buffer[BUFFER_SIZE + 1];
     ssize_t read_bytes;
-    Tintin_reporter* reporter = Tintin_reporter::GetInstance();
 
     read_bytes = recv(fd, buffer, BUFFER_SIZE, 0);
     if (read_bytes < 0) {
@@ -157,14 +152,13 @@ void Server::readMessage(int fd) {
     } else {
         buffer[read_bytes] = '\0';
         if (std::string(buffer) == "quit\n") {
-            Tintin_reporter* reporter = Tintin_reporter::GetInstance();
-            reporter->log_to_file("INFO", "Request quit.\n");
+            ft_log("INFO", "Request quit.\n");
             _running = false;
             return;
         }
         std::cout << "Message received from client " << fd << ": " << buffer << std::endl;
         std::string message = "User input: " + std::string(buffer);
-        reporter->log_to_file("LOG", message);
+        ft_log("LOG", message);
     }
 }
 
