@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <csignal>
 #include <sys/stat.h>
+#include <sys/file.h>
 #include <errno.h>
 #include "../inc/Server.hpp"
 #include "../inc/utils.hpp"
@@ -16,6 +17,9 @@ void ft_exit(int status) {
 
     ft_log("INFO", "Quitting.\n");
     try {
+        int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
+        flock(fd, LOCK_UN);
+        close(fd);
         std::remove(LOCK_FILE);
     } catch (const std::exception& e) {
         ft_log("ERROR", "Error removing lock file.\n");
@@ -62,22 +66,20 @@ int main() {
 
     setreuid(geteuid(), getuid());
 
-    // Check if lock file exists
-    if (is_file_existing(LOCK_FILE)) {
+    int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
+    if (fd == -1) {
         std::cerr << "Can't open :" << LOCK_FILE << std::endl;
-        ft_log("ERROR", "Error File locked\n");
+        ft_log("ERROR", "Can't open :" + std::string(LOCK_FILE) + "\n");
         return 1;
     }
-
-    // create lock file
-    std::ofstream newLockFile(LOCK_FILE);
-    if (newLockFile.is_open()) {
-        newLockFile.close();
-    } else {
+    int rc = flock(fd, LOCK_EX | LOCK_NB); 
+    if (rc == -1 && errno == EWOULDBLOCK)
+    {
         std::cerr << "Lock file already exists." << std::endl;
         ft_log("ERROR", "Error File locked\n");
         return 1;
     }
+    close(fd);
 
     ft_log("INFO", "Creating server\n");
     try {
