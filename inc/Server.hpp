@@ -41,7 +41,6 @@ public:
 
 	static bool 		_running;
 
-	
 
 	Server& 			operator=(const Server &src);
 	

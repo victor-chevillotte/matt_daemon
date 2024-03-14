@@ -2,13 +2,24 @@
 #define LOG_FILE_PATH "/tmp/log/matt_daemon.log"
 #define LOG_FOLDER_PATH "/tmp/log/"
 
-
+// default constructor
 Tintin_reporter::Tintin_reporter() {
 }
 
+// destructor
 Tintin_reporter::~Tintin_reporter() {
 }
 
+// copy constructor
+Tintin_reporter::Tintin_reporter(const Tintin_reporter& other) {
+    reporter_instance = other.reporter_instance;
+}
+
+// assignment operator
+Tintin_reporter&	Tintin_reporter::operator=(const Tintin_reporter& rhs) {
+    reporter_instance = rhs.reporter_instance;
+    return *this;
+}
 
 std::string Tintin_reporter::format_message(const std::string& log_level, const std::string& message) {
     // Time format : DD / MM / YYYY - HH : MM : SS
