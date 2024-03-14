@@ -17,9 +17,6 @@ void ft_exit(int status) {
 
     ft_log("INFO", "Quitting.\n");
     try {
-        int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
-        flock(fd, LOCK_UN);
-        close(fd);
         std::remove(LOCK_FILE);
     } catch (const std::exception& e) {
         ft_log("ERROR", "Error removing lock file.\n");
@@ -52,7 +49,6 @@ bool is_file_existing(const std::string& name) {
 
 
 int main() {
-    // TODO: Replace with 4242
     const int PORT = 4242;
 
     ft_log("INFO", "Started.\n");    
@@ -63,9 +59,9 @@ int main() {
         ft_log("ERROR", "You must be root to run this program.\n");
         return 1;
     }
-
     setreuid(geteuid(), getuid());
 
+    // Lock file
     ft_log("DEBUG", "Opening file lock.\n");
     int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
     if (fd == -1) {
@@ -80,8 +76,6 @@ int main() {
         ft_log("ERROR", "Error File locked\n");
         return 1;
     }
-    close(fd);
-    ft_log("DEBUG", "Lock acquired.\n");
 
     ft_log("INFO", "Creating server\n");
     try {
