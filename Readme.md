@@ -64,3 +64,12 @@ kill -2 <pid>
 cat /var/log/matt_daemon.log
 ```
 
+```
+[14/03/2024-15:30:51] [ INFO ] - Matt_deamon: Started.
+[14/03/2024-15:30:51] [ DEBUG ] - Matt_deamon: Opening file lock.
+[14/03/2024-15:30:51] [ DEBUG ] - Matt_deamon: Lock acquired.
+[14/03/2024-15:30:51] [ INFO ] - Matt_deamon: Creating server
+[14/03/2024-15:30:51] [ INFO ] - Matt_deamon: Server created
+[14/03/2024-15:30:51] [ INFO ] - Matt_deamon: Entering daemon mode
+[14/03/2024-15:30:51] [ INFO ] - Matt_deamon: Started. PID: 5681
+```
