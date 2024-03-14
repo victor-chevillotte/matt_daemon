@@ -12,17 +12,15 @@ protected:
 
     Tintin_reporter();
     static Tintin_reporter* reporter_instance;
-    const std::string log_file_path;
 
 public:
 
-    Tintin_reporter(Tintin_reporter &other) = delete;
-    void operator=(const Tintin_reporter &) = delete;
+    Tintin_reporter(const Tintin_reporter &other);
+    ~Tintin_reporter();
 
     static Tintin_reporter *GetInstance();
 
-
-    ~Tintin_reporter();
+	Tintin_reporter& 			operator=(const Tintin_reporter &src);
 
     void log_to_file(const std::string& log_level, const std::string& message);
     std::string format_message(const std::string& log_level, const std::string& message);
