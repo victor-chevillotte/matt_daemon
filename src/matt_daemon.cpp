@@ -53,6 +53,15 @@ int main() {
 
     ft_log("INFO", "Started.\n");    
 
+    // Run as root
+    if (getuid() != 0) {
+        std::cerr << "You must be root to run this program." << std::endl;
+        ft_log("ERROR", "You must be root to run this program.\n");
+        return 1;
+    }
+
+    setreuid(geteuid(), getuid());
+
     // Check if lock file exists
     if (is_file_existing(LOCK_FILE)) {
         std::cerr << "Can't open :" << LOCK_FILE << std::endl;
