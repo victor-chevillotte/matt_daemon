@@ -66,20 +66,6 @@ int main() {
 
     setreuid(geteuid(), getuid());
 
-    int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
-    if (fd == -1) {
-        std::cerr << "Can't open :" << LOCK_FILE << std::endl;
-        ft_log("ERROR", "Can't open :" + std::string(LOCK_FILE) + "\n");
-        return 1;
-    }
-    int rc = flock(fd, LOCK_EX | LOCK_NB); 
-    if (rc == -1 && errno == EWOULDBLOCK)
-    {
-        std::cerr << "Lock file already exists." << std::endl;
-        ft_log("ERROR", "Error File locked\n");
-        return 1;
-    }
-    close(fd);
 
     ft_log("INFO", "Creating server\n");
     try {
@@ -96,6 +82,21 @@ int main() {
         else if (c_pid > 0) { 
             exit(EXIT_SUCCESS);
         }
+        
+        int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
+        if (fd == -1) {
+            std::cerr << "Can't open :" << LOCK_FILE << std::endl;
+            ft_log("ERROR", "Can't open :" + std::string(LOCK_FILE) + "\n");
+            return 1;
+        }
+        int rc = flock(fd, LOCK_EX | LOCK_NB); 
+        if (rc == -1 && errno == EWOULDBLOCK)
+        {
+            std::cerr << "Lock file already exists." << std::endl;
+            ft_log("ERROR", "Error File locked\n");
+            return 1;
+        }
+        close(fd);
         ft_log("INFO", "Started. PID: " + std::to_string(getpid()) + "\n");
     
         // Catch all signals
