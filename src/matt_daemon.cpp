@@ -62,7 +62,7 @@ int main() {
     if (newLockFile.is_open()) {
         newLockFile.close();
     } else {
-        std::cerr << "Can't open :" << LOCK_FILE << std::endl;
+        std::cerr << "Lock file already exists." << std::endl;
         reporter->log_to_file("ERROR", "Error File locked\n");
         return 1;
     }
