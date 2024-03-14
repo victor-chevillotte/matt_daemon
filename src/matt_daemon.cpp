@@ -5,14 +5,16 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "../inc/Server.hpp"
+#include "../inc/utils.hpp"
 
 //TODO: Replace with /var/lock/matt_daemon.lock
 #define LOCK_FILE "/tmp/lock/matt_daemon.lock"
 
+
+
 void ft_exit(int status) {
-    
-    Tintin_reporter* reporter = Tintin_reporter::GetInstance();
-    reporter->log_to_file("INFO", "Quitting.\n"); //not working
+
+    ft_log("INFO", "Quitting.\n");
     try {
         std::remove(LOCK_FILE);
     } catch (const std::exception& e) {
@@ -24,8 +26,8 @@ void ft_exit(int status) {
 
 void signalHandler( int signum ) {
     Server::_running = false;
-    Tintin_reporter* reporter = Tintin_reporter::GetInstance();
-    reporter->log_to_file("INFO", "Signal handler.\n");
+
+    ft_log("INFO", "Signal handler.\n");
     ft_exit(signum);
 }
 
@@ -47,13 +49,13 @@ bool is_file_existing(const std::string& name) {
 int main() {
     // TODO: Replace with 4242
     const int PORT = 4343;
-    Tintin_reporter* reporter = Tintin_reporter::GetInstance();
-    reporter->log_to_file("INFO", "Started.\n"); 
+
+    ft_log("INFO", "Started.\n");    
 
     // Check if lock file exists
     if (is_file_existing(LOCK_FILE)) {
         std::cerr << "Can't open :" << LOCK_FILE << std::endl;
-        reporter->log_to_file("ERROR", "Error File locked\n");
+        ft_log("ERROR", "Error File locked\n");
         return 1;
     }
 
@@ -63,17 +65,17 @@ int main() {
         newLockFile.close();
     } else {
         std::cerr << "Lock file already exists." << std::endl;
-        reporter->log_to_file("ERROR", "Error File locked\n");
+        ft_log("ERROR", "Error File locked\n");
         return 1;
     }
 
-    reporter->log_to_file("INFO", "Creating server\n");
+    ft_log("INFO", "Creating server\n");
     try {
         Server server = Server(std::to_string(PORT));
-        reporter->log_to_file("INFO", "Server created\n");
+        ft_log("INFO", "Server created\n");
 
         // Fork the process and quit the parent process, leaving child process as daemon
-        reporter->log_to_file("INFO", "Entering daemon mode\n");
+        ft_log("INFO", "Entering daemon mode\n");
         pid_t c_pid = fork(); 
         if (c_pid == -1) { 
             perror("fork"); 
@@ -82,7 +84,7 @@ int main() {
         else if (c_pid > 0) { 
             exit(EXIT_SUCCESS);
         }
-        reporter->log_to_file("INFO", "Started. PID: " + std::to_string(getpid()) + "\n");
+        ft_log("INFO", "Started. PID: " + std::to_string(getpid()) + "\n");
     
         // Catch all signals
         set_signals();
@@ -91,7 +93,7 @@ int main() {
 
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
-        reporter->log_to_file("ERROR", "Server runtime error.\n");
+        ft_log("ERROR", "Server runtime error.\n");
         return 1;
     }
     

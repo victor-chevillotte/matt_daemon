@@ -8,7 +8,8 @@ DEBUG			:= -fsanitize=address
 OPTI			:= -O3
 
 INC				:=	tintin_reporter.hpp \
-					Server.hpp
+					Server.hpp \
+					utils.hpp
 
 INC_DIR			:= inc/
 
@@ -16,7 +17,8 @@ INC_FILES		:= $(addprefix $(INC_DIR), $(INC))
 
 SRCS			:=	matt_daemon.cpp \
 					tintin_reporter.cpp \
-					server.cpp
+					server.cpp \
+					utils.cpp
 
 SRCS_DIR		:= src/
 
