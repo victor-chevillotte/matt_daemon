@@ -35,11 +35,26 @@ void set_signals() {
     }
 }
 
+bool is_file_existing(const std::string& name) {
+    struct stat buffer;
+    // check works even if file is a symlink or chmod 000
+    // stat() is a function which is used to get the status of file. It fills the buffer pointed to by buffer with the status information of the file pointed to by name.
+    return (stat (name.c_str(), &buffer) == 0); 
+}
+
+
 int main() {
     // TODO: Replace with 4242
     const int PORT = 4343;
     Tintin_reporter* reporter = Tintin_reporter::GetInstance();
-    reporter->log_to_file("INFO", "Started.\n");    
+    reporter->log_to_file("INFO", "Started.\n"); 
+
+    // Check if lock file exists
+    if (is_file_existing(LOCK_FILE)) {
+        std::cerr << "Error: File locked\n";
+        reporter->log_to_file("ERROR", "Error File locked\n");
+        return 1;
+    }
 
     // create lock file
     std::ofstream newLockFile(LOCK_FILE);
