@@ -73,7 +73,7 @@ int main() {
     if (rc == -1 && errno == EWOULDBLOCK)
     {
         std::cerr << "Lock file already exists." << std::endl;
-        ftLog("ERROR", "Error File locked\n");
+        ftLog("ERROR", "Error file locked.\n");
         return 1;
     }
 
