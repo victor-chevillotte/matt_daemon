@@ -3,4 +3,4 @@
 #include <iostream>
 
 
-void ft_log(const std::string& level, const std::string& message);
+void ftLog(const std::string& level, const std::string& message);

@@ -164,13 +164,13 @@ void Server::readMessage(int fd) {
     } while (buffer[read_bytes - 1] != '\n');
 
     if (fullMessage == "quit\n") {
-        ft_log("INFO", "Request quit.\n");
+        ftLog("INFO", "Request quit.\n");
         _running = false;
         return;
     }
     std::cout << "Message received from client " << fd << ": " << fullMessage << std::endl;
     std::string message = "User input: " + std::string(fullMessage);
-    ft_log("LOG", message);
+    ftLog("LOG", message);
 }
 
 

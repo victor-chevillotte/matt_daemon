@@ -23,8 +23,8 @@ public:
 
 	Tintin_reporter& 			operator=(const Tintin_reporter &src);
 
-    void log_to_file(const std::string& log_level, const std::string& message);
-    std::string format_message(const std::string& log_level, const std::string& message);
-    bool create_directory_if_not_exists(const std::string& path);
+    void logToFile(const std::string& log_level, const std::string& message);
+    std::string formatMessage(const std::string& log_level, const std::string& message);
+    bool createDirectoryIfNotExists(const std::string& path);
 
 };
