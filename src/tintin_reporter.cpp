@@ -12,12 +12,12 @@ Tintin_reporter::~Tintin_reporter() {
 
 // copy constructor
 Tintin_reporter::Tintin_reporter(const Tintin_reporter& other) {
-    reporter_instance = other.reporter_instance;
+    pReporterInstance = other.pReporterInstance;
 }
 
 // assignment operator
 Tintin_reporter&	Tintin_reporter::operator=(const Tintin_reporter& rhs) {
-    reporter_instance = rhs.reporter_instance;
+    pReporterInstance = rhs.pReporterInstance;
     return *this;
 }
 
@@ -78,12 +78,12 @@ void    Tintin_reporter::logToFile(const std::string& log_level, const std::stri
     }
 }
 
-Tintin_reporter* Tintin_reporter::reporter_instance= nullptr;;
+Tintin_reporter* Tintin_reporter::pReporterInstance= nullptr;;
 
 Tintin_reporter *Tintin_reporter::GetInstance()
 {
-    if(reporter_instance == nullptr) {
-        reporter_instance = new Tintin_reporter();
+    if(pReporterInstance == nullptr) {
+        pReporterInstance = new Tintin_reporter();
     }
-    return reporter_instance;
+    return pReporterInstance;
 }

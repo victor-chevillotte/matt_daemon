@@ -12,7 +12,7 @@ class Tintin_reporter
 protected:
 
     Tintin_reporter();
-    static Tintin_reporter* reporter_instance;
+    static Tintin_reporter* pReporterInstance;
 
 public:
 
