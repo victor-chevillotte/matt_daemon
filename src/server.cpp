@@ -120,7 +120,6 @@ void Server::onClientConnect() {
         return;
     }
     if (_pollfds.size() > 3) {
-        std::cout << "Max active connections reached." << std::endl;
         close(fd);
         return;
     }
@@ -128,12 +127,10 @@ void Server::onClientConnect() {
     pollfd pollfd = {fd, POLLIN | POLLOUT, 0};
     _pollfdsToAdd.push_back(pollfd);
 
-    std::cout << "Client connected" << std::endl;
 }
 
 void Server::onClientDisconnect(int fd) {
     _fdToDelete.push_back(fd);
-    std::cout << "Client has disconnected" << std::endl;
 }
 
 void Server::onClientMessage(int fd) {
@@ -168,7 +165,6 @@ void Server::readMessage(int fd) {
         _running = false;
         return;
     }
-    std::cout << "Message received from client " << fd << ": " << fullMessage << std::endl;
     std::string message = "User input: " + std::string(fullMessage);
     ftLog("LOG", message);
 }
