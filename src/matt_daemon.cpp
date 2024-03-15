@@ -49,15 +49,15 @@ bool isFileExisting(const std::string& name) {
 int main() {
     const int PORT = 4242;
 
-    ftLog("INFO", "Started.\n");    
 
     // Run as root
     if (getuid() != 0) {
         std::cerr << "You must be root to run this program." << std::endl;
-        ftLog("ERROR", "You must be root to run this program.\n");
         return 1;
     }
     setreuid(geteuid(), getuid());
+
+    ftLog("INFO", "Started.\n");
 
     // Lock file
     int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
@@ -70,7 +70,7 @@ int main() {
     if (rc == -1)
     {
         if (errno == EWOULDBLOCK) {
-        std::cerr << "Lock file already exists." << std::endl;
+        std::cerr << "Can't open :" << LOCK_FILE << std::endl;
         ftLog("ERROR", "Error file locked.\n");
         }
         close(fd);
