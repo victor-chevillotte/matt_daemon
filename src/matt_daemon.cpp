@@ -70,10 +70,13 @@ int main() {
         return 1;
     }
     int rc = flock(fd, LOCK_EX | LOCK_NB); 
-    if (rc == -1 && errno == EWOULDBLOCK)
+    if (rc == -1)
     {
+        if (errno == EWOULDBLOCK) {
         std::cerr << "Lock file already exists." << std::endl;
         ftLog("ERROR", "Error file locked.\n");
+        }
+        close(fd);
         return 1;
     }
 
