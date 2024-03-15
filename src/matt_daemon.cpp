@@ -60,7 +60,6 @@ int main() {
     setreuid(geteuid(), getuid());
 
     // Lock file
-    ftLog("DEBUG", "Opening file lock.\n");
     int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
     if (fd == -1) {
         std::cerr << "Can't open :" << LOCK_FILE << std::endl;
