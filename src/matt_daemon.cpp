@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <sys/file.h>
 #include <errno.h>
-#include "../inc/Server.hpp"
+#include "../inc/server.hpp"
 #include "../inc/utils.hpp"
 
 //TODO: Replace with /var/lock/matt_daemon.lock

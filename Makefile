@@ -8,7 +8,7 @@ DEBUG			:= -fsanitize=address
 OPTI			:= -O3
 
 INC				:=	tintin_reporter.hpp \
-					Server.hpp \
+					server.hpp \
 					utils.hpp
 
 INC_DIR			:= inc/

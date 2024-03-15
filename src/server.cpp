@@ -1,4 +1,4 @@
-#include "../inc/Server.hpp"
+#include "../inc/server.hpp"
 
 
 // default constructor
