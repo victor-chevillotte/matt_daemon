@@ -8,9 +8,7 @@
 #include "../inc/server.hpp"
 #include "../inc/utils.hpp"
 
-//TODO: Replace with /var/lock/matt_daemon.lock
 #define LOCK_FILE "/var/lock/matt_daemon.lock"
-
 
 
 void ftExit(int status) {
@@ -43,7 +41,7 @@ void setSignals() {
 bool isFileExisting(const std::string& name) {
     struct stat buffer;
     // check works even if file is a symlink or chmod 000
-    // stat() is a function which is used to get the status of file. It fills the buffer pointed to by buffer with the status information of the file pointed to by name.
+    // stat() is a function which is used to get the status of file
     return (stat (name.c_str(), &buffer) == 0); 
 }
 

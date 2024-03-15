@@ -18,7 +18,7 @@
 #include "../inc/utils.hpp"
 
 #define BUFFER_SIZE 10000
-#define MAX_CONNECTIONS_POOL 3
+#define MAX_CONNECTIONS_POOL 10
 
 class Server;
 
