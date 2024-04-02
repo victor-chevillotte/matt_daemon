@@ -116,11 +116,11 @@ void Server::onClientConnect() {
     socklen_t s_size = sizeof(s_address);
     int fd = accept(_sock, (sockaddr *)&s_address, &s_size);
     if (fd < 0) {
-        ftLog("ERROR", "Error while accepting new client.\n")
+        ftLog("ERROR", "Error while accepting new client.\n");
         return;
     }
     if (_pollfds.size() > 3) {
-        ftLog("ERROR", "Max connections reached (3).\n")
+        ftLog("ERROR", "Max connections reached (3).\n");
         close(fd);
         return;
     }
@@ -152,7 +152,7 @@ void Server::readMessage(int fd) {
         }
 
         if (read_bytes < 0) {
-            ftLog("ERROR", "Error while reading from client.\n" )
+            ftLog("ERROR", "Error while reading from client.\n");
             _running = false;
             return;
         }
@@ -194,3 +194,4 @@ void Server::deleteDisconnectedClients() {
 }
 
 bool Server::_running = true;
+int Server::_lock_fd = -1;
