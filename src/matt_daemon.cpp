@@ -15,6 +15,7 @@ void ftExit(int status) {
 
     ftLog("INFO", "Quitting.\n");
     try {
+        flock(fd, LOCK_UN);
         std::remove(LOCK_FILE);
     } catch (const std::exception& e) {
         ftLog("ERROR", "Error removing lock file.\n");
