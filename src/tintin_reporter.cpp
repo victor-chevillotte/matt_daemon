@@ -1,6 +1,6 @@
 #include "../inc/tintin_reporter.hpp"
-#define LOG_FILE_PATH "/var/log/matt_daemon.log"
-#define LOG_FOLDER_PATH "/var/log/"
+#define LOG_FILE_PATH "/var/log/matt_daemon/matt_daemon.log"
+#define LOG_FOLDER_PATH "/var/log/matt_daemon/"
 
 // default constructor
 Tintin_reporter::Tintin_reporter() {
