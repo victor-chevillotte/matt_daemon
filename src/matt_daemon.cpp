@@ -109,7 +109,6 @@ int main() {
         ftExit(0);
 
     } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
         ftLog("ERROR", "Server runtime error.\n");
         ftExit(1);
     }
