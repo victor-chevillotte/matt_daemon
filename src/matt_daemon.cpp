@@ -58,6 +58,12 @@ int main() {
     }
     setreuid(geteuid(), getuid());
 
+    int ret = chdir("/");
+    if (ret == -1) {
+        ftLog("ERROR", "Can't run at root directory.\n");
+        ftExit(EXIT_FAILURE);
+    }
+
     ftLog("INFO", "Started.\n");
 
     // Lock file
