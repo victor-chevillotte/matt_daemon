@@ -43,6 +43,7 @@ public:
 	~Server();
 
 	static bool 		_running;
+	static int			_lock_fd;
 
 
 	Server& 			operator=(const Server &src);

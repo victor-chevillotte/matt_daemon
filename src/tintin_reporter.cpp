@@ -1,6 +1,6 @@
 #include "../inc/tintin_reporter.hpp"
-#define LOG_FILE_PATH "/var/log/matt_daemon.log"
-#define LOG_FOLDER_PATH "/var/log/"
+#define LOG_FILE_PATH "/var/log/matt_daemon/matt_daemon.log"
+#define LOG_FOLDER_PATH "/var/log/matt_daemon/"
 
 // default constructor
 Tintin_reporter::Tintin_reporter() {
@@ -40,7 +40,7 @@ bool    Tintin_reporter::createDirectoryIfNotExists(const std::string& path) {
     } else if (ENOENT == errno) {
         // directory does not exist, create it
         if (mkdir(path.c_str(), 0755) == -1) {
-            std::cerr << "Error while creating log folder" << std::endl;
+            // std::cerr << "Error while creating log folder." << std::endl;
             return false;
         }
         return true;
@@ -48,14 +48,14 @@ bool    Tintin_reporter::createDirectoryIfNotExists(const std::string& path) {
         // directory exists but could not ne opened
         struct stat info;
         if (stat(path.c_str(), &info) != 0) {
-            std::cerr << "Error while accessing directory and checking its existence " << std::endl;
+            // std::cerr << "Error while accessing directory." << std::endl;
             return false;
         }
         if (S_ISDIR(info.st_mode)) {
             // file exists
             return true;
         }
-        std::cerr << "The path exists, but it is not a directory." << std::endl;
+        // std::cerr << "The path exists, but it is not a directory." << std::endl;
         return false;
     }
 }
@@ -66,6 +66,7 @@ void    Tintin_reporter::logToFile(const std::string& logLevel, const std::strin
     // /var/log/matt_daemon is existng directory ?
     bool directory_success = createDirectoryIfNotExists(LOG_FOLDER_PATH);
     if (!directory_success) {
+       std::cerr << "Unable to log to specified file." << std::endl;
        return;
     }
     std::ofstream logFile(LOG_FILE_PATH, std::ios::app);

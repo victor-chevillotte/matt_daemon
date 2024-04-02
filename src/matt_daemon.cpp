@@ -15,6 +15,10 @@ void ftExit(int status) {
 
     ftLog("INFO", "Quitting.\n");
     try {
+        if (Server::_lock_fd != -1) {
+            flock(Server::_lock_fd, LOCK_UN);
+            close(Server::_lock_fd);
+        }
         std::remove(LOCK_FILE);
     } catch (const std::exception& e) {
         ftLog("ERROR", "Error removing lock file.\n");
@@ -57,23 +61,29 @@ int main() {
     }
     setreuid(geteuid(), getuid());
 
+    int ret = chdir("/");
+    if (ret == -1) {
+        ftLog("ERROR", "Can't run at root directory.\n");
+        ftExit(EXIT_FAILURE);
+    }
+    
     ftLog("INFO", "Started.\n");
 
     // Lock file
-    int fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
-    if (fd == -1) {
+    Server::_lock_fd = open(LOCK_FILE, O_CREAT | O_RDWR, 0644);
+    if (Server::_lock_fd == -1) {
         std::cerr << "Can't open :" << LOCK_FILE << std::endl;
         ftLog("ERROR", "Can't open :" + std::string(LOCK_FILE) + "\n");
         return 1;
     }
-    int rc = flock(fd, LOCK_EX | LOCK_NB); 
+    int rc = flock(Server::_lock_fd, LOCK_EX | LOCK_NB); 
     if (rc == -1)
     {
         if (errno == EWOULDBLOCK) {
         std::cerr << "Can't open :" << LOCK_FILE << std::endl;
         ftLog("ERROR", "Error file locked.\n");
         }
-        close(fd);
+        close(Server::_lock_fd);
         return 1;
     }
 
@@ -102,7 +112,6 @@ int main() {
         ftExit(0);
 
     } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
         ftLog("ERROR", "Server runtime error.\n");
         ftExit(1);
     }
